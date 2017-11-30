@@ -56,7 +56,7 @@ public class TokenStream {
 				// skip rest of line - it's a comment.
 				//TODO: 
 				// look for <cr>, <lf>, <ff>  10, 12, 13
-				while(nextChar != 10 && nextChar != 12 && nextChar != 13) {
+				while(nextChar != 10 && nextChar != 12 && nextChar != 13 && nextChar != 0) {
 					nextChar = readChar();
 				};
 				nextChar = readChar();
@@ -66,12 +66,14 @@ public class TokenStream {
 				// 92 is \, the number is used since \ causes an error.
 				if (nextChar == 92) {
 					t.setValue("/" + nextChar);
+					t.setType("Operator");
 					nextChar = readChar();
-				} else
+				} else {
 					// A slash followed by anything else must be an operator.
 					t.setValue("/");
-				t.setType("Operator");
-				return t;
+					t.setType("Operator");
+					return t;
+				}
 			}
 		}
 
@@ -143,6 +145,32 @@ public class TokenStream {
 			// an operator, or a separator.
 			if (isEndOfToken(nextChar)) // If token is valid, returns.
 				return t;
+		}
+		
+		if (nextChar == '&') {
+			nextChar = readChar();
+			if (nextChar == '&') {
+				t.setValue("&" + nextChar);
+				t.setType("Operator");
+				nextChar = readChar();
+			} else {
+				t.setValue("&");
+				t.setType("Other");				
+			}
+			return t;
+		}
+		
+		if (nextChar == '|') {
+			nextChar = readChar();
+			if (nextChar == '|') {
+				t.setValue("|" + nextChar);
+				t.setType("Operator");
+				nextChar = readChar();
+			} else {
+				t.setValue("|");
+				t.setType("Other");				
+			}
+			return t;
 		}
 
 		if (isEof)
@@ -232,7 +260,8 @@ public class TokenStream {
 	}
 	
 	private boolean is2CharOperator(String s) {
-		return (s.equals("<=") || s.equals(">=") || s.equals("==") || s.equals("!="));
+		return (s.equals("<=") || s.equals(">=") || s.equals("==") || 
+				s.equals("!=") || s.equals("&&") || s.equals("||"));
 	}
 
 	private boolean isLetter(char c) {
