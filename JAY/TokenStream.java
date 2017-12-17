@@ -54,29 +54,15 @@ public class TokenStream {
 			nextChar = readChar();
 			if (nextChar == '/') { // If / is followed by another /
 				// skip rest of line - it's a comment.
-				//TODO: 
 				// look for <cr>, <lf>, <ff>  10, 12, 13
 				while(nextChar != 10 && nextChar != 12 && nextChar != 13 && nextChar != 0) {
 					nextChar = readChar();
 				};
 				nextChar = readChar();
 
-			} else {
-				// A slash followed by a backslash is an AND operator (/\).
-				// 92 is \, the number is used since \ causes an error.
-				if (nextChar == 92) {
-					t.setValue("/" + nextChar);
-					t.setType("Operator");
-					nextChar = readChar();
-				} else {
-					// A slash followed by anything else must be an operator.
-					t.setValue("/");
-					t.setType("Operator");
-					return t;
-				}
 			}
 		}
-
+		skipWhiteSpace();
 		// Then check for an operator; recover 2-character operators
 		// as well as 1-character ones.
 		if (isOperator(nextChar)) {
@@ -116,7 +102,6 @@ public class TokenStream {
 			t.setType("Separator");
 			t.setValue(t.getValue() + nextChar);
 			nextChar = readChar();
-			//TODO: 
 			return t;
 		}
 
@@ -136,7 +121,7 @@ public class TokenStream {
 		}
 
 		if (isDigit(nextChar)) { // check for integers
-			t.setType("Integer-Literal");
+			t.setType("Literal");
 			while (isDigit(nextChar)) {
 				t.setValue(t.getValue() + nextChar);
 				nextChar = readChar();
